@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="layaut/layaut :: head">
+</head>
+
+<body>
+  <header th:replace="layaut/layaut :: header"></header>
+  <div class="card container py-4">
+    <div class="card-header" th:text="${titulo}">
+
+    </div>
+    <div class="card-body">
+      <div class="card-title">
+        <a th:href="@{/form}" class="btn btn-primary">Crear Cliente</a>
+      </div>
+
+      <table class="table table-hover table-striped table-bordered ">
+        <thead class="table-dark">
+          <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Email</th>
+            <th>Fecha</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="cli : ${cliente}">
+            <td><a class="btn btn-primary btn-xs" th:href="@{'/ver/'+${cli.id}}"  th:text="${cli.id}"></a></td>
+            <td th:text="${cli.nombre}"></td>
+            <td th:text="${cli.apellido}"></td>
+            <td th:text="${cli.email}"></td>
+            <td th:text="${cli.createAt}"></td>
+            <td>
+              <a class="btn btn-success btn-xs" th:href="@{'/factura/form/'+${cli.id}}">Crear Factura</a>
+              <a class="btn btn-primary btn-xs" th:href="@{/form/}+${cli.Id}">Editar</a>
+              <a class="btn btn-danger btn-xs" th:href="@{/eliminar/}+${cli.Id}"
+                onclick="return confirm('Estás seguro que deseas eliminar?');">Eliminar</a>                
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <nav th:replace="paginator-nav :: paginator"></nav>
+    </div>
+  </div>
+  <footer th:replace="layaut/layaut :: footer"></footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
