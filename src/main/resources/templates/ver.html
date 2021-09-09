@@ -44,7 +44,7 @@
                   <td th:text="${factura.createAt}"></td>
                   <td th:text="${factura.total}"></td>
                   <td><a class="btn btn-primary btn-xs" th:href="@{'/factura/ver/'+${factura.id}}">Detalle</a></td>
-                  <td><a class="btn btn-danger btn-xs" th:onClick="${codFactura}= ${factura.id}" data-bs-toggle="modal" data-bs-target="#eliminarModal">Eliminar</a></td>   
+                  <td><a class="btn btn-danger btn-xs" th:href="@{'/factura/eliminar/'+${factura.id}}" onclick="return confirm('Está seguro que desea eliminar la factura?')">Eliminar</a></td>
                 </tr>
               </tbody>
 
@@ -54,24 +54,6 @@
       </div>
     </div>
   </div>
-  <!-- Modal -->
-<div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header dark">
-        <h5 class="modal-title" id="exampleModalLabel">Eliminar Factura</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <span>Realmente desea eliminar la Factura?</span>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">cancelar</button>
-        <a class="btn btn-primary" th:href="@{'/factura/eliminar/'+${codFactura}}">Aceptar</a>
-      </div>
-    </div>
-  </div>
-</div>
   <footer th:replace="layaut/layaut :: footer"></footer>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"

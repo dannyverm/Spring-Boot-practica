@@ -14,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
@@ -78,7 +77,11 @@ public class FacturaController {
 
     @GetMapping(value="/ver/{id}")
     public String verFactura(Model model,@PathVariable Long id, RedirectAttributes flash) {
-        Factura factura=clienteService.findFacturaById(id);
+        //clienteService.findFacturaById(id);
+        //el metodo de arriba hace la consulta para buscar factura e iten y producto en 6 consltas
+        //mientras que en la de abajo hacemos en una sola consulta con @Query en la interface IFacturaDao
+        // optimizando asi nuestra consulta
+        Factura factura= clienteService.fetchFacturaByIdWhithClienteWhithItemFacturaWithProducto(id);
         
         if( factura==null){
             flash.addFlashAttribute("error", "La factura no existe");
@@ -103,10 +106,5 @@ public class FacturaController {
         return "redirect:/listar";
     }
     
-    @ModelAttribute("codFactura")
-    public Long codigo(@RequestParam Long id){
-        
-        return id;
-    }
-
+    
 }

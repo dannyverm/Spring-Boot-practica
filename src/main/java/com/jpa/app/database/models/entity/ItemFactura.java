@@ -14,9 +14,11 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "facturas_items")
 public class ItemFactura implements Serializable {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+   
     private Integer cantidad;
 
     @JoinColumn(name = "producto_id")
