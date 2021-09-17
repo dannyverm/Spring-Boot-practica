@@ -6,9 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-
 import javax.servlet.http.HttpServletRequest;
-
 import com.jpa.app.database.controllers.paginator.PageRender;
 import com.jpa.app.database.models.entity.Cliente;
 import com.jpa.app.database.models.services.IClienteService;
@@ -86,7 +84,9 @@ public class ClienteController {
         model.addAttribute("cliente", cliente);
         return "form";
     }
-
+    //Otra forma de autorizar es mediante el preAuthorize que es lo mismo que @Secured pero para eso hay que habilitarlo desde 
+    //la clase SpringSecurityConfig en @EnableGlobalMethodSecurity(securedEnabled = true,prePostEnable =true)
+    //@PreAuthorize("hasRole('ROLE_USER')")
     @Secured("ROLE_USER")
     @GetMapping(value = "/ver/{id}")
     public String ver(@PathVariable Long id, Model model, RedirectAttributes flash) {
@@ -103,7 +103,7 @@ public class ClienteController {
         return "ver";
     }
 
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN","ROLE_USER"})
     @PostMapping(value = "/form")
     public String guardar(Cliente cliente, SessionStatus status, RedirectAttributes flash,
             @RequestParam("file") MultipartFile foto) {
