@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.timeleaf.org/extras/spring-security">
 
 <head th:replace="layaut/layaut :: head">
 </head>
@@ -8,32 +8,32 @@
   <header th:replace="layaut/layaut :: header"></header>
   <div class="card container py-4">
     <div class="card-header" th:text="${titulo}">
-
     </div>
     <div class="card-body">
       <div class="card-title">
-        <a th:href="@{/form}" class="btn btn-primary">Crear Cliente</a>
+        <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/form}" class="btn btn-primary">Crear Cliente</a>
+        <h6>Nombre de usuario= <span th:text="${usuario}"></span></h6>
       </div>
 
       <table class="table table-hover table-striped table-bordered ">
         <thead class="table-dark">
           <tr>
-            <th>Id</th>
+            <th sec:authorize="hasRole('ROLE_USER')">Id</th>
             <th>Nombre</th>
             <th>Apellido</th>
             <th>Email</th>
             <th>Fecha</th>
-            <th>Acción</th>
+            <th sec:authorize="hasRole('ROLE_ADMIN')">Acción</th>
           </tr>
         </thead>
         <tbody>
           <tr th:each="cli : ${cliente}">
-            <td><a class="btn btn-primary btn-xs" th:href="@{'/ver/'+${cli.id}}"  th:text="${cli.id}"></a></td>
+            <td sec:authorize="hasRole('ROLE_USER')" ><a class="btn btn-primary btn-xs" th:href="@{'/ver/'+${cli.id}}"  th:text="${cli.id}"></a></td>
             <td th:text="${cli.nombre}"></td>
             <td th:text="${cli.apellido}"></td>
             <td th:text="${cli.email}"></td>
             <td th:text="${cli.createAt}"></td>
-            <td>
+            <td sec:authorize="hasRole('ROLE_ADMIN')">
               <a class="btn btn-success btn-xs" th:href="@{'/factura/form/'+${cli.id}}">Crear Factura</a>
               <a class="btn btn-primary btn-xs" th:href="@{/form/}+${cli.Id}">Editar</a>
               <a class="btn btn-danger btn-xs" th:href="@{/eliminar/}+${cli.Id}"

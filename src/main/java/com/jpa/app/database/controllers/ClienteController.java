@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
+
+import javax.servlet.http.HttpServletRequest;
+
 import com.jpa.app.database.controllers.paginator.PageRender;
 import com.jpa.app.database.models.entity.Cliente;
 import com.jpa.app.database.models.services.IClienteService;
@@ -12,6 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,10 +39,37 @@ public class ClienteController {
     @Autowired
     private IClienteService clienteService;
 
-    @GetMapping(value = "/listar")
-    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
+    @GetMapping(value = { "/listar", "/" })
+    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model,
+            Authentication authentication,
+            HttpServletRequest request ) {
+        if (authentication != null) {
+            model.addAttribute("usuario", authentication.getName());
+        }
+
+        // Otra forma de guardar el authentication utilizando forma estatica
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        // if (hasRole("ADMIN_ROLE")) {
+
+        // }
+
+        SecurityContextHolderAwareRequestWrapper securityContext= new SecurityContextHolderAwareRequestWrapper(request, "ROL_");
+        if (securityContext.isUserInRole("ADMIN")) {
+            //Aqui enviamos el security contex a traves del model    
+        }else{
+            // informamos que no tiene acceso
+        }
+
+        // validar utilizando directo el HttpServletRequest
+        if(request.isUserInRole("ROLE_ADMIN")){
+            //Aqui enviamos el security contex a traves del model    
+        }
+
         Pageable pageR = PageRequest.of(page, 4);
+
         Page<Cliente> clientes = clienteService.findAll(pageR);
+
         PageRender<Cliente> pageRender = new PageRender<>("/listar", clientes);
         model.addAttribute("titulo", "Listado de Clientes");
         model.addAttribute("cliente", clientes);
@@ -41,6 +78,7 @@ public class ClienteController {
         return "listar";
     }
 
+    @Secured("ROLE_ADMIN")
     @GetMapping(value = "/form")
     public String form(Model model) {
         Cliente cliente = new Cliente();
@@ -49,21 +87,23 @@ public class ClienteController {
         return "form";
     }
 
+    @Secured("ROLE_USER")
     @GetMapping(value = "/ver/{id}")
     public String ver(@PathVariable Long id, Model model, RedirectAttributes flash) {
-        
-        Cliente cliente = clienteService.fetchByIdWithFacturas(id);//clienteService.findOne(id);
-        
+
+        Cliente cliente = clienteService.fetchByIdWithFacturas(id);// clienteService.findOne(id);
+
         if (cliente == null) {
             flash.addFlashAttribute("error", "El cliente no existe en la base de datos");
             return "redirect:/listar";
         }
-        
+
         model.addAttribute("cliente", cliente);
         model.addAttribute("titulo", "Detalle cliente: " + cliente.getNombre());
         return "ver";
     }
 
+    @Secured("ROLE_ADMIN")
     @PostMapping(value = "/form")
     public String guardar(Cliente cliente, SessionStatus status, RedirectAttributes flash,
             @RequestParam("file") MultipartFile foto) {
@@ -91,6 +131,7 @@ public class ClienteController {
         return "redirect:/listar";
     }
 
+    @Secured("ROLE_ADMIN")
     @GetMapping(value = "/form/{id}")
     public String editar(@PathVariable Long id, Model model, RedirectAttributes flash) {
         Cliente cli = null;
@@ -106,6 +147,7 @@ public class ClienteController {
         return "form";
     }
 
+    @Secured("ROLE_ADMIN")
     @GetMapping(value = "/eliminar/{id}")
     public String eliminar(@PathVariable Long id) {
 
@@ -120,6 +162,29 @@ public class ClienteController {
 
         }
         return "redirect:/listar";
+    }
+
+    private boolean hasRole(String role) {
+        SecurityContext context = SecurityContextHolder.getContext();
+        if (context == null) {
+            return false;
+        }
+
+        Authentication auth = context.getAuthentication();
+
+        if (auth == null) {
+            return false;
+        }
+
+        Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+
+        for (GrantedAuthority authority : authorities) {
+            if (role.equals(authority.getAuthority())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
